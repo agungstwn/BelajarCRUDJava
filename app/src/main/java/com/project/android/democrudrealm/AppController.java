@@ -1,6 +1,7 @@
 package com.project.android.democrudrealm;
 
 import android.app.Application;
+import android.content.Context;
 
 import io.realm.DynamicRealm;
 import io.realm.Realm;
@@ -14,11 +15,17 @@ import io.realm.RealmSchema;
 
 public class AppController extends Application {
 
+    private static AppController mInstance;
+
     @Override
     public void onCreate() {
         super.onCreate();
-        RealmConfiguration configuration = new RealmConfiguration.Builder()
-                .schemaVersion(0)
+
+        mInstance = this;
+        Realm.init(this);
+        RealmConfiguration configuration = new RealmConfiguration
+                .Builder()
+                .deleteRealmIfMigrationNeeded()
                 .migration(new DataMigration())
                 .build();
         Realm.setDefaultConfiguration(configuration);
