@@ -1,13 +1,13 @@
 package com.project.android.democrudrealm.module.activity;
 
-import android.content.Context;
 import android.content.Intent;
+import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.AppCompatActivity;
-import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.View;
+import android.widget.TextView;
 
 import com.project.android.democrudrealm.R;
 import com.project.android.democrudrealm.module.adapter.BookAdapter;
@@ -27,6 +27,8 @@ public class MainActivity extends AppCompatActivity {
     RecyclerView recyclerView;
     @BindView(R.id.fab)
     FloatingActionButton fab;
+    @BindView(R.id.jumlah_data)
+    TextView mJmlData;
 
 
     private RealmHelper realmHelper;
@@ -39,8 +41,9 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
         ButterKnife.bind(this);
 
-        dataModels = new  ArrayList<DataModel>();
+        dataModels = new ArrayList<>();
         realmHelper = new RealmHelper(this);
+        mJmlData.setText(String.valueOf(dataModels.size()));
 
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
 
@@ -54,9 +57,9 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void setRecyclerView() {
-        try{
-            dataModels = realmHelper.findAll();
-        }catch (Exception e){
+        try {
+            dataModels = realmHelper.findAllBook();
+        } catch (Exception e) {
             e.printStackTrace();
         }
         BookAdapter bookAdapter = new BookAdapter(dataModels, new BookAdapter.OnItemClickListener() {
@@ -75,11 +78,7 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onResume() {
         super.onResume();
-        try{
-            dataModels = realmHelper.findAll();
-        }catch (Exception e){
-            e.printStackTrace();
-        }
+        dataModels = realmHelper.findAllBook();
         setRecyclerView();
     }
 }

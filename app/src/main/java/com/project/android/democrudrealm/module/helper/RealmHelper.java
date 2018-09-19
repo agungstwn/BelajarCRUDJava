@@ -18,13 +18,13 @@ import io.realm.Sort;
 
 public class RealmHelper {
     private static final String TAG = "RealmHelper";
-    private Realm realm;
+    private Realm mLocalDb;
     private RealmResults<Data> realmResults;
 
     //Constructor to create instance realm
 
     public RealmHelper(Context context) {
-        realm = Realm.getInstance(Realm.getDefaultConfiguration());
+        mLocalDb = Realm.getInstance(Realm.getDefaultConfiguration());
     }
 
     private void showLog(String show) {
@@ -38,20 +38,21 @@ public class RealmHelper {
         book.setTitle(title);
         book.setDescription(description);
 
-        realm.beginTransaction();
-        realm.copyToRealm(book);
-        realm.commitTransaction();
+        mLocalDb.beginTransaction();
+        mLocalDb.copyToRealm(book);
+        mLocalDb.commitTransaction();
 
         showLog("Added : " + title);
         showLog("Desc : " + description);
     }
 
     //findAll Data
-    public ArrayList<DataModel> findAll(){
+    public ArrayList<DataModel> findAllBook(){
         ArrayList<DataModel> dataModels = new ArrayList<>();
 
-        realmResults = realm.where(Data.class).findAll();
+        realmResults = mLocalDb.where(Data.class).findAll();
         realmResults.sort("id", Sort.DESCENDING);
+
         showLog("Title: " + String.valueOf(realmResults.get(0).getTitle()));
         showLog("Desc: " + String.valueOf(realmResults.get(0).getDescription()));
 
@@ -63,6 +64,23 @@ public class RealmHelper {
             dataModels.add(new DataModel(id, title, description));
         }
         return dataModels;
+    }
+
+    //update
+    public void update(int id, String title, String description){
+        mLocalDb.beginTransaction();
+        Data book = mLocalDb.where(Data.class).equalTo("id", id).findFirst();
+        book.setTitle(title);
+        book.setDescription(description);
+        mLocalDb.commitTransaction();
+        showLog("update:" + title);
+    }
+
+    //delete
+    public void delete(int id){
+        mLocalDb.executeTransaction(realm -> {
+            realm.where(Data.class).equalTo("id", id).findAll().deleteAllFromRealm();
+        });
     }
 
 }
